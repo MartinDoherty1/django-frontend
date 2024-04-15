@@ -1,6 +1,6 @@
 "use client";
 import { useQuery, useMutation } from "react-query";
-import { useRouter } from "next/router";
+import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import _ from 'lodash';
 import { queryClient } from '../../Components/QueryClientProvider';
@@ -10,16 +10,19 @@ import ErrorWithExerciseMutation from "../../Components/ErrorWithExerciseMutatio
 import Workout from "../../Models/Workout";
 import { deleteWorkoutById, GetWorkoutById, changeWorkout } from "../../Services/CreateWorkout";
 import { GetExercises } from "../../Services/GetExercises";
-import React, { useState } from "react";
+import React, {  useState } from "react";
 import Exercise from "../../Models/Exercise";
+import { useUser } from "@auth0/nextjs-auth0/client";
 
 
 const UpdateWorkout = () => {
     const [workout, setWorkout] = useState<Workout>({workout_name: "", exercise: []});
     const [exercises, setExercises] = useState<Exercise[]>();
+    const {user} = useUser();
 
-    const router = useRouter();
-    const { workoutId } = router.query as {workoutId: string};
+    const SearchParams = useSearchParams();
+
+    const  workoutId  = SearchParams.get('workoutId');
 
     useQuery<Exercise[], Error>(
         ['exercises'],
@@ -36,7 +39,7 @@ const UpdateWorkout = () => {
 
     const {data: fetchedWorkout} = useQuery<Workout, Error>(
         ['workout'],
-        () => GetWorkoutById(workoutId),
+        () => GetWorkoutById(workoutId!),
         {
           retry: (_failureCount, error) => error.message !=="No Results!!",
           refetchOnWindowFocus: false,
@@ -48,7 +51,7 @@ const UpdateWorkout = () => {
         }
     );
 
-    const deleteWorkoutMutation = useMutation(() => deleteWorkoutById(workoutId),
+    const deleteWorkoutMutation = useMutation(() => deleteWorkoutById(workoutId!),
     {
         onError: (err:Error) => {
             console.error(`Error Deleting Workout: ${err.message}`);
@@ -58,7 +61,7 @@ const UpdateWorkout = () => {
         }
     })
 
-    const updateWorkoutMutation = useMutation(() => changeWorkout(workout!, workoutId),
+    const updateWorkoutMutation = useMutation(() => changeWorkout(workout!, workoutId!),
     {
         onError: (err:Error) => {
             console.error(`Error Creating Workout: ${err.message}`);
@@ -150,7 +153,7 @@ const UpdateWorkout = () => {
 
     return(
         <>
-            <Navbar/>
+            <Navbar isLoggedIn={user ? true : false }/>
             {(workout.exercise.length === 0) && (
                 <div className="bg-red-500 text-white text-center p-2">You Must Select An Exercise</div>
             )}

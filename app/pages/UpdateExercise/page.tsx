@@ -1,8 +1,10 @@
+"use client";
 import React, { useState } from "react";
 import { useQuery, useMutation } from "react-query";
-import { useRouter } from "next/router";
+import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import Exercise from "../../Models/Exercise";
+import { useUser } from "@auth0/nextjs-auth0/client";
 import Loading from "../../Components/Loading";
 import convertType from "../../Utils/ConvertShortHandToLongHand";
 import { GetExerciseById } from "../../Services/GetExercises";
@@ -16,13 +18,14 @@ const UpdateExercise = () =>
 {
     const [updateExercise, setUpdateExercise] = useState<Exercise | null>(null);
     const [sameExercise, setSameExercise] = useState<boolean>(false);
+    const SearchParams = useSearchParams();
 
-    const router = useRouter();
-    const { exerciseId } = router.query as {exerciseId: string};
+    const { user } = useUser();
+    const  exerciseId  = SearchParams.get('exerciseId');
 
     const {data: originalExercise} = useQuery<Exercise, Error>(
         ['exercises'],
-        () => GetExerciseById(exerciseId),
+        () => GetExerciseById(exerciseId!),
         {
           retry: (_failureCount, error) => error.message !=="No Results!!",
           enabled: exerciseId !== undefined,
@@ -33,7 +36,7 @@ const UpdateExercise = () =>
         }
       );
 
-    const updateExerciseMutation = useMutation(() => changeExercise(updateExercise!, exerciseId),
+    const updateExerciseMutation = useMutation(() => changeExercise(updateExercise!, exerciseId!),
     {
         onError: (err:Error) => {
             console.error(`Error Creating Exercise: ${err.message}`);
@@ -43,7 +46,7 @@ const UpdateExercise = () =>
         }
     })
 
-    const deleteExerciseMutation = useMutation(() => deleteExerciseById(exerciseId),
+    const deleteExerciseMutation = useMutation(() => deleteExerciseById(exerciseId!),
     {
         onError: (err:Error) => {
             console.error(`Error Deleting Exercise: ${err.message}`);
@@ -113,7 +116,7 @@ const UpdateExercise = () =>
     return(
     <>
         <title>Update Exercise</title>
-        <Navbar/>
+        <Navbar isLoggedIn={user ? true : false }/>
         {updateExerciseMutation.isSuccess ? (
             <div className="bg-gray-100 h-screen flex items-center justify-center">
                 <div className="bg-white p-8 rounded-lg shadow-lg max-w-md w-full">

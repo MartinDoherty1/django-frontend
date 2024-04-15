@@ -9,6 +9,7 @@ import { GetExercises } from "../../Services/GetExercises";
 import Workout from "../../Models/Workout";
 import Navbar from '../../Components/NavigationBar';
 import { createWorkout } from '../../Services/CreateWorkout';
+import { useUser } from '@auth0/nextjs-auth0/client';
 
 
 const CreateWorkout = () => 
@@ -16,6 +17,8 @@ const CreateWorkout = () =>
     const [exercises, setExercises] = useState<Exercise[] | null>(null);
 
     const [workout, setWorkout] = useState<Workout>({workout_name: "", exercise: []});
+
+    const {user} = useUser();
 
     useQuery<Exercise[], Error>(
         ['exercises'],
@@ -114,7 +117,7 @@ const CreateWorkout = () =>
     return (
         <>
             <title>Create Workout</title>
-            <Navbar/>
+            <Navbar isLoggedIn={user ? true : false }/>
             <div className="p-6 space-y-6">
                 <form id='workout-form' onSubmit={handleSubmission}>
                     <div className="grid grid-cols-6 gap-6">

@@ -10,10 +10,12 @@ import ErrorWithExerciseMutation from '../../Components/ErrorWithExerciseMutatio
 import ExerciseForm from '../../Components/ExerciseForm';
 import Navbar from '../../Components/NavigationBar';
 import { queryClient } from '../../Components/QueryClientProvider';
+import { useUser } from '@auth0/nextjs-auth0/client';
 
 const CreateExercise = () =>
 {
     const [newExercise, setNewExercise] = useState<Exercise | null>(null);
+    const { user } = useUser();
 
     const createExerciseMutation = useMutation(() => createExercise(newExercise!),
         {
@@ -53,7 +55,7 @@ const CreateExercise = () =>
     return(
         <>
             <title>Create Exercise</title>
-            <Navbar/>
+            <Navbar isLoggedIn={user ? true : false }/>
             {createExerciseMutation.isSuccess ? (
                 <div className="bg-gray-100 h-screen flex items-center justify-center">
                     <div className="bg-white p-8 rounded-lg shadow-lg max-w-md w-full">

@@ -5,6 +5,7 @@ import Link from "next/link";
 import React from "react";
 import Workout from "../../Models/Workout";
 import { GetWorkouts } from "../../Services/CreateWorkout";
+import { useUser } from "@auth0/nextjs-auth0/client";
 
 const ViewWorkout = () => {
 
@@ -16,15 +17,17 @@ const ViewWorkout = () => {
         }
     );
 
+    const {user} = useUser();
+
     return(
         <>
             <title>View Workout</title>
-            <Navbar/>
+            <Navbar isLoggedIn={user ? true : false }/>
             <div className="flex flex-wrap flex-row justify-center">
                 {workoutResults && workoutResults.map((item,index) => (
                         <React.Fragment key={index}>
                             <div className="border-4 hover:bg-gray-400 rounded-full border-sky-500 m-10 p-5 w-1/5">
-                                <Link href={`/UpdateWorkout?workoutId=${item.id?.toString()}`}>
+                                <Link href={`/pages/UpdateWorkout?workoutId=${item.id?.toString()}`}>
                                     <p className="text-center">{item.workout_name}</p>
                                 </Link>
                             </div>

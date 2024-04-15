@@ -5,10 +5,13 @@ import DebouncedValue from '../../Utils/DebouncedValue';
 import { useQuery } from 'react-query';
 import Exercise from '../../Models/Exercise';
 import Navbar from '../../Components/NavigationBar';
+import { useUser } from '@auth0/nextjs-auth0/client';
 
 const Search = () =>
 {
     const [searchTerm, setSearchTerm] = useState<string>("");
+
+    const {user} = useUser();
 
     const debouncedSearchTerm = DebouncedValue(searchTerm, 500);
 
@@ -23,7 +26,7 @@ const Search = () =>
 
     return(
         <>
-            <Navbar/>
+            <Navbar isLoggedIn={user ? true : false }/>
             <div className='m-5'>
                 
                 <div className="flex flex-1 items-center justify-center p-6">
